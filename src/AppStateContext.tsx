@@ -1,5 +1,6 @@
+import { nanoid } from "nanoid"
 import {createContext, useReducer, useContext} from "react"
-
+import { findItemIndexById, overrideItemAtIndex } from "./utils/arrayUtils"
 
 
 type Task = {
@@ -66,13 +67,43 @@ const appStateReducer = (state: AppState, action : Action): AppState => {
   switch(action.type){
     case  "ADD_LIST": {
       //Reducer logic here
-    
+      return {
+        ...state,
+        lists: [
+          ...state.lists,
+          {id: nanoid(), text: action.payload, tasks: []}
+        ]
+      }
     }
     case  "ADD_TASK": {
-      //Reducer logic here
+      const targetListIndex = findItemIndexById(
+        state.lists,
+        action.payload.listId
+      )
+      const targeList = state.lists[targetListIndex]
+      const updatedTargetList = {
+        ...targeList,
+        tasks: [
+          ...targeList.tasks,
+          {id: nanoid(), text: action.payload.text}
+        ]
+        
+      }
+      // state.lists[targetListIndex].tasks.push({
+      //   id: nanoid(),
+      //   text:action.payload.text
+      // })
+      return {
+        ...state,
+        lists: overrideItemAtIndex(
+          state.lists,
+          updatedTargetList,
+          targetListIndex
+        )
+      }
     }
     default: {
-       //Reducer logic here
+      return state
     }
   }
 
